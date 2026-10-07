@@ -3,6 +3,7 @@ const Event = require('../models/event.model.js');
 const router = express.Router();
 const eventController = require('../controllers/event.controller.js');
 
+router.get('/upcoming', eventController.upcomingEvent)
 router.get('/', eventController.getEvents)
 router.get('/:id', eventController.getEventById)
 router.post('/', eventController.createEvent)

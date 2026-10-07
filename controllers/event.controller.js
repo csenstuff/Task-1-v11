@@ -1,5 +1,20 @@
 const Event = require('../models/event.model.js');
 
+const upcomingEvent = async (req, res, next) => {
+  try {
+    const events = await Event.find({
+      date: { $gt: new Date() },
+    }).sort({ date: 1 });
+    
+    events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    res.json(events);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+
 const createEvent = async (req, res) => {
      try {
         const event = await Event.create(req.body);
@@ -15,7 +30,34 @@ const createEvent = async (req, res) => {
 
 const getEvents = async (req, res) => {
      try {
-        const events = await Event.find();
+     	const filters = {};
+     	
+    	if(req.query.title){
+     	  filters.title = req.query.title;
+     	}
+     	if(req.query.isFree){
+     	  filters.isFree = (req.query.isFree === "true");
+     	}
+     	if(req.query.description){
+     	  filters.description = req.query.description;
+     	}
+     	if(req.query.date){
+     	  filters.date = new Date(req.query.date);
+     	}
+     	if(req.query.location){
+     	  filters.location = req.query.location;
+     	}
+     	if(req.query.capacity){
+     	  filters.capacity = Number(req.query.capacity);
+     	}
+     	if(req.query.category){
+     	  filters.category = req.query.category;
+     	}
+     	if(req.query.price){
+     	  filters.price = Number(req.query.price);
+     	}
+     	
+        const events = await Event.find(filters);
         res.json(events);
       }
       catch (error) {
@@ -69,6 +111,7 @@ const deleteEvent = async (req, res) => {
 }
 
 module.exports = {
+    upcomingEvent,
     getEvents,
     getEventById,
     createEvent,
