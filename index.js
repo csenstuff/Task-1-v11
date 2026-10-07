@@ -1,20 +1,25 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const process = require('node:process');
 const Product = require('./models/product.model.js');
 const productRoutes = require('./routes/product.route.js');
+const Event = require('./models/event.model.js');
+const eventRoutes = require('./routes/event.route.js');
 
 
 const app = express()
+const { loadEnvFile } = require('node:process');
+loadEnvFile('.env');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 //routes
 app.use('/api/products', productRoutes)
+app.use('/api/events', eventRoutes)
 
 
-
-app.listen(3000, () => {
+app.listen(process.env.PORT, () => {
   console.log('Server is running on http://localhost:3000')
 })
 
@@ -100,8 +105,8 @@ app.get('/', (req, res) => {
   // })
  
 
-
-mongoose.connect("your connection string")
+mongoose.set('runValidators', true);
+mongoose.connect(process.env.MONGO_URI)
 .then(() => {
   console.log('Connected to MongoDB')
 })
